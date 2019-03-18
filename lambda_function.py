@@ -1,5 +1,4 @@
 # coding:utf-8
-# https://github.com/fourninecloud/SSL_Certs_expiry-Check
 
 import socket
 import ssl
@@ -12,8 +11,6 @@ from urllib.error import URLError, HTTPError
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-domainlist = []
 
 def ssl_expiry_date(domainname):
     ssl_date_fmt = r'%b %d %H:%M:%S %Y %Z'
@@ -77,8 +74,9 @@ def notify_slack(dName, eDays, color):
 # Main Section
 client = boto3.client('sns')
 def lambda_handler(event, context):
-    domainlist.append(os.environ['Domain'])
-    for dName in domainlist:
+    domainlist = os.environ['Domain'].split(',')
+    for dName_includeSpace in domainlist:
+        dName = dName_includeSpace.strip()
         logger.info(dName)
         expDate = ssl_valid_time_remaining(dName.strip())
         (a, b) = str(expDate).split(',')
